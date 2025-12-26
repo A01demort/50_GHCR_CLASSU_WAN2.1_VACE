@@ -37,16 +37,6 @@ RUN mkdir -p /workspace && chmod -R 777 /workspace && \
 
 WORKDIR /workspace/ComfyUI
 
-# ✅ 이 파트가 가장 중요 (5090에서) PyTorch (cu128) 먼저 설치
-RUN pip install --upgrade --force-reinstall --pre \
-    torch torchvision torchaudio \
-    --index-url https://download.pytorch.org/whl/nightly/cu128
-
-# 나머지 requirements.txt (torch 제외) 설치
-RUN pip install -r /workspace/ComfyUI/requirements.txt --no-deps
-
-# 추가로 빠질 수 있는 필수 모듈 한 번에 설치 (✅ 이 파트가 가장 중요 )
-RUN pip install trampoline multidict propcache aiohappyeyeballs aiosignal async-timeout frozenlist mako
 
 # Node.js 18 설치 (기존 nodejs 제거 후)
 RUN apt-get remove -y nodejs npm && \
