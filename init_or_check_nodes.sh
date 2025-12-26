@@ -4,13 +4,37 @@
 echo "🌀 RunPod 재시작 시 의존성 복구 시작"
 
 ############################################
+# 📦 PyTorch / ComfyUI core (Dockerfile에서 이동)
+############################################
+echo "📦 PyTorch nightly cu128 설치 확인"
+
+python - <<EOF
+import torch
+print(torch.__version__)
+EOF
+
+if [ $? -ne 0 ]; then
+  pip install --upgrade --pre \
+    torch torchvision torchaudio \
+    --index-url https://download.pytorch.org/whl/nightly/cu128 || echo '⚠️ torch 설치 실패'
+fi
+
+echo "📦 ComfyUI requirements (torch 제외)"
+pip install -r /workspace/ComfyUI/requirements.txt --no-deps || echo '⚠️ requirements 설치 실패'
+
+echo "📦 추가 필수 모듈 보완"
+pip install trampoline multidict propcache aiohappyeyeballs \
+    aiosignal async-timeout frozenlist mako || echo '⚠️ 보완 모듈 실패'
+
+
+############################################
 # 📦 코어 파이썬 패키지 (ComfyUI 필수)
 ############################################
 echo '📦 코어 파이썬 패키지 설치'
 
 pip install torchsde || echo '⚠️ torchsde 설치 실패'
 pip install av || echo '⚠️ av 설치 실패'
-pip install torchaudio || echo '⚠️ torchaudio 설치 실패'
+# pip install torchaudio || echo '⚠️ torchaudio 설치 실패' 임시 보류(1226)
 
 ############################################
 # 📦 일반 파이썬 패키지 (Dockerfile에서 이동)
